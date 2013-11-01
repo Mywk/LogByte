@@ -132,17 +132,17 @@ public class LogBlock extends JavaPlugin
                         getLogger().info("Scheduled consumer with timer.");
                 }
                 getServer().getScheduler().runTaskAsynchronously(this, new Updater.PlayerCountChecker(this));
-                for (final Tool tool : toolsByType.values())
+                /*for (final Tool tool : toolsByType.values())
                         if (pm.getPermission("logblock.tools." + tool.name) == null) {
                                 final Permission perm = new Permission("logblock.tools." + tool.name, tool.permissionDefault);
                                 pm.addPermission(perm);
                         }
-//                try {
-//                        Metrics metrics = new Metrics(this);
-//                        metrics.start();
-//                } catch (IOException ex) {
-//                        getLogger().info("Could not start metrics: " + ex.getMessage());
-//                }
+                try {
+                        Metrics metrics = new Metrics(this);
+                        metrics.start();
+                } catch (IOException ex) {
+                        getLogger().info("Could not start metrics: " + ex.getMessage());
+                }*/
         }
 
         private void registerEvents() {

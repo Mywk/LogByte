@@ -70,7 +70,7 @@ public class CommandsHandler implements CommandExecutor
 					//sender.sendMessage(ChatColor.GOLD + "/lb tool [on|off] -- Enables/Disables tool");
 					//sender.sendMessage(ChatColor.GOLD + "/lb tool [params] -- Sets the tool lookup query");
 					//sender.sendMessage(ChatColor.GOLD + "/lb tool default -- Sets the tool lookup query to default");
-					//sender.sendMessage(ChatColor.GOLD + "/lb toolblock -- Analog to tool");
+					sender.sendMessage(ChatColor.GOLD + "/lb toolblock -- Analog to tool");
 					sender.sendMessage(ChatColor.GOLD + "/lb hide -- Hides you from log");
 					sender.sendMessage(ChatColor.GOLD + "/lb rollback [params] -- Rollback");
 					sender.sendMessage(ChatColor.GOLD + "/lb redo [params] -- Redo");
@@ -131,7 +131,7 @@ public class CommandsHandler implements CommandExecutor
 							sender.sendMessage(ChatColor.RED + "No world specified");
 					} else
 						sender.sendMessage(ChatColor.RED + "You aren't allowed to do this.");
-				} else if (toolsByName.get(command) != null) {
+				}else if (toolsByName.get(command) != null) {
 					final Tool tool = toolsByName.get(command);
 					if (logblock.hasPermission(sender, "logblock.tools." + tool.name)) {
 						if (sender instanceof Player) {
@@ -234,7 +234,8 @@ public class CommandsHandler implements CommandExecutor
 						new CommandRedo(sender, params, true);
 					} else
 						sender.sendMessage(ChatColor.RED + "You aren't allowed to do this.");
-				} else if (command.equals("me")) {
+				}
+				 else if (command.equals("me")) {
 					if (sender instanceof Player) {
 						if (logblock.hasPermission(sender, "logblock.me")) {
 							final Player player = (Player)sender;

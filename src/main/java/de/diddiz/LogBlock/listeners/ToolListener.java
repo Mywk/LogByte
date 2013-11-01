@@ -48,7 +48,7 @@ public class ToolListener implements Listener
 			if (tool != null && (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK) && logblock.hasPermission(player, "logblock.tools." + tool.name)) {
 				final ToolBehavior behavior = action == Action.RIGHT_CLICK_BLOCK ? tool.rightClickBehavior : tool.leftClickBehavior;
 				final ToolData toolData = getSession(player).toolData.get(tool);
-				if (behavior != ToolBehavior.NONE && toolData.enabled) {
+				if ((behavior != ToolBehavior.NONE ) && toolData.enabled) {
 					if (!isLogged(player.getWorld())) {
 						player.sendMessage(ChatColor.RED + "This world is not currently logged.");
 						event.setCancelled(true);
