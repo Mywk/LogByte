@@ -97,9 +97,9 @@ public class BlockChange implements LookupCacheElement
 			else if (type == 132)
 				msg.append("ran into ").append(this.type + ":" + this.data);
 		} else if (type == 0)
-			msg.append("destroyed ").append(this.type + ":" + this.data);
+			msg.append("destroyed ").append(this.replaced + ":" + this.data);
 		else if (replaced == 0)
-			msg.append("created ").append(this.replaced +":"+ this.data);
+			msg.append("created ").append(this.type +":"+ this.data);
 		else
 			msg.append("replaced ").append(this.type + ":" + this.data).append(" with ").append(this.type + ":" + this.data);
 		if (loc != null)
