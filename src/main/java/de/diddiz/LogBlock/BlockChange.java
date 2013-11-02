@@ -63,7 +63,7 @@ public class BlockChange implements LookupCacheElement
 				msg.append("did an unspecified action");
 			else if (ca != null) {
 				if (ca.itemType == 0 || ca.itemAmount == 0)
-					msg.append("looked inside ").append(type +":"+ data);
+					msg.append("looked inside ").append(this.type + ":" + this.data);
 				else if (ca.itemAmount < 0)
 				{
 					//System.out.println("TEST TOOK");
@@ -72,7 +72,7 @@ public class BlockChange implements LookupCacheElement
 					else
 					msg.append("put in ").append(ca.itemAmount).append("x ").append(ca.itemType +":"+ ca.itemData);
 			} else if (BukkitUtils.getContainerBlocks().contains(Material.getMaterial(type)))
-				msg.append("opened ").append(type +":"+ data);
+				msg.append("opened ").append(this.type + ":" + this.data);
 			else if (type == 64 || type == 71)
 				// This is a problem that will have to be addressed in LB 2,
 				// there is no way to tell from the top half of the block if
@@ -80,28 +80,28 @@ public class BlockChange implements LookupCacheElement
 				msg.append("moved ").append(ca.itemType +":"+ ca.itemData);
 			// Trapdoor
 			else if (type == 96)
-				msg.append((data < 8 || data > 11) ? "opened" : "closed").append(" ").append(type +":"+ data);
+				msg.append((data < 8 || data > 11) ? "opened" : "closed").append(" ").append(this.type + ":" + this.data);
 			// Fence gate
 			else if (type == 107)
-				msg.append(data > 3 ? "opened" : "closed").append(" ").append(type +":"+ data);
+				msg.append(data > 3 ? "opened" : "closed").append(" ").append(this.type + ":" + this.data);
 			else if (type == 69)
-				msg.append("switched ").append(type +":"+ data);
+				msg.append("switched ").append(this.type + ":" + this.data);
 			else if (type == 77 || type == 143)
-				msg.append("pressed ").append(type +":"+ data);
+				msg.append("pressed ").append(this.type + ":" + this.data);
 			else if (type == 92)
-				msg.append("ate a piece of ").append(type +":"+ data);
+				msg.append("ate a piece of ").append(this.type + ":" + this.data);
 			else if (type == 25 || type == 93 || type == 94 || type == 149 || type == 150)
 				msg.append("changed ").append(ca.itemType +":"+ ca.itemData);
 			else if (type == 70 || type == 72 || type == 147 || type == 148)
-				msg.append("stepped on ").append(type +":"+ data);
+				msg.append("stepped on ").append(this.type + ":" + this.data);
 			else if (type == 132)
-				msg.append("ran into ").append(type +":"+ data);
+				msg.append("ran into ").append(this.type + ":" + this.data);
 		} else if (type == 0)
-			msg.append("destroyed ").append(type +":"+ data);
+			msg.append("destroyed ").append(this.type + ":" + this.data);
 		else if (replaced == 0)
-			msg.append("created ").append(replaced +":"+ data);
+			msg.append("created ").append(this.replaced +":"+ this.data);
 		else
-			msg.append("replaced ").append(type +":"+ data).append(" with ").append(type +":"+ data);
+			msg.append("replaced ").append(this.type + ":" + this.data).append(" with ").append(this.type + ":" + this.data);
 		if (loc != null)
 			msg.append(" at ").append(loc.getBlockX()).append(":").append(loc.getBlockY()).append(":").append(loc.getBlockZ());
 		return msg.toString();
