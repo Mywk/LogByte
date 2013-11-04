@@ -65,6 +65,7 @@ public class Consumer extends TimerTask
 	public void queueBlockBreak(String playerName, Location loc, int typeBefore, byte dataBefore) {
 		queueBlock(playerName, loc, typeBefore, 0, dataBefore);
 	}
+	
 
 	/**
 	 * Logs a block place. The block type before is assumed to be o (air).

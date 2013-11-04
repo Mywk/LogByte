@@ -1,7 +1,11 @@
 package de.diddiz.util;
 
 import static de.diddiz.LogBlock.config.Config.getWorldConfig;
+
 import java.util.List;
+
+import de.diddiz.LogBlock.Consumer;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -17,7 +21,7 @@ import org.bukkit.material.RedstoneTorch;
 import org.bukkit.material.Torch;
 import org.bukkit.material.TrapDoor;
 import org.bukkit.material.TripwireHook;
-import de.diddiz.LogBlock.Consumer;
+
 import de.diddiz.LogBlock.Logging;
 import de.diddiz.LogBlock.config.WorldConfig;
 

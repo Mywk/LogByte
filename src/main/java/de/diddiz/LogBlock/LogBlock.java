@@ -25,6 +25,8 @@ import de.diddiz.LogBlock.listeners.ToolListener;
 import de.diddiz.LogBlock.listeners.WitherLogging;
 import de.diddiz.util.MySQLConnectionPool;
 import de.diddiz.worldedit.LogBlockEditSessionFactory;
+import de.diddiz.LogBlock.Consumer;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -171,7 +173,7 @@ public class LogBlock extends JavaPlugin
                 if (isLogging(Logging.CHESTACCESS)) {
                         pm.registerEvents(new ChestAccessLogging(this), this);
                 }
-                if (isLogging(Logging.SWITCHINTERACT) || isLogging(Logging.DOORINTERACT) || isLogging(Logging.CAKEEAT) || isLogging(Logging.DIODEINTERACT) || isLogging(Logging.COMPARATORINTERACT) || isLogging(Logging.NOTEBLOCKINTERACT) || isLogging(Logging.PRESUREPLATEINTERACT) || isLogging(Logging.TRIPWIREINTERACT) || isLogging(Logging.CROPTRAMPLE))
+                if (isLogging(Logging.WRENCH) || isLogging(Logging.SWITCHINTERACT) || isLogging(Logging.DOORINTERACT) || isLogging(Logging.CAKEEAT) || isLogging(Logging.DIODEINTERACT) || isLogging(Logging.COMPARATORINTERACT) || isLogging(Logging.NOTEBLOCKINTERACT) || isLogging(Logging.PRESUREPLATEINTERACT) || isLogging(Logging.TRIPWIREINTERACT) || isLogging(Logging.CROPTRAMPLE))
                         pm.registerEvents(new InteractLogging(this), this);
                 if (isLogging(Logging.CREATURECROPTRAMPLE)) {
                         pm.registerEvents(new CreatureInteractLogging(this), this);

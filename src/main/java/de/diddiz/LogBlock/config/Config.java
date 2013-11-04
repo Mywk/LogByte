@@ -23,7 +23,10 @@ public class Config
 {
 	// Mywk
 	public static Set<Integer> customBlockIds;
-	
+	public static Set<Integer> wrenchIds;
+	public static int forceWrenchPlaceId;
+	public static boolean wrenchLog;
+
 	private static LoggingEnabledMapping superWorldConfig;
 	private static Map<String, WorldConfig> worldConfigs;
 	public static String url, user, password;
@@ -80,6 +83,8 @@ public class Config
 		def.put("consumer.fireCustomEvents", false);
 		def.put("consumer.useBukkitScheduler", true);
 		def.put("consumer.queueWarningSize", 1000);
+		def.put("wrenchLog", true);
+		def.put("forceWrenchPlaceId", 6304);
 		def.put("clearlog.dumpDeletedLog", false);
 		def.put("clearlog.enableAutoClearLog", false);
 		def.put("clearlog.auto", Arrays.asList("world \"world\" before 365 days all", "world \"world\" player lavaflow waterflow leavesdecay before 7 days all", "world world_nether before 365 days all", "world world_nether player lavaflow before 7 days all"));
@@ -134,6 +139,11 @@ public class Config
 		for (final Entry<String, Object> e : def.entrySet())
 			if (!config.contains(e.getKey()))
 				config.set(e.getKey(), e.getValue());
+		// Mywk, default FTB Unleashed wrenches
+		def.put("wrenchIds", Arrays.asList(4370,5263,21997,19362,30183,11363,30140,6294));
+		for (final Entry<String, Object> e : def.entrySet())
+			if (!config.contains(e.getKey()))
+				config.set(e.getKey(), e.getValue());
 		logblock.saveConfig();
 		url = "jdbc:mysql://" + config.getString("mysql.host") + ":" + config.getInt("mysql.port") + "/" + getStringIncludingInts(config, "mysql.database") + "?useUnicode=true&characterEncoding=utf-8";
 		user = getStringIncludingInts(config, "mysql.user");
@@ -180,6 +190,7 @@ public class Config
 		linesLimit = config.getInt("lookup.linesLimit", 1500);
 		askRollbacks = config.getBoolean("questioner.askRollbacks", true);
 		askRedos = config.getBoolean("questioner.askRedos", true);
+		wrenchLog = config.getBoolean("wrenchLog",true);
 		askClearLogs = config.getBoolean("questioner.askClearLogs", true);
 		askClearLogAfterRollback = config.getBoolean("questioner.askClearLogAfterRollback", true);
 		askRollbackAfterBan = config.getBoolean("questioner.askRollbackAfterBan", false);
@@ -216,7 +227,9 @@ public class Config
 		
 		// Mywk configs
 		customBlockIds = new HashSet<Integer>(config.getIntegerList("customBlockIds"));
-				
+		wrenchIds = new HashSet<Integer>(config.getIntegerList("wrenchIds"));
+		forceWrenchPlaceId = config.getInt("forceWrenchPlaceId", 6304);
+		
 		final List<String> loggedWorlds = config.getStringList("loggedWorlds");
 		worldConfigs = new HashMap<String, WorldConfig>();
 		if (loggedWorlds.isEmpty())
@@ -229,12 +242,6 @@ public class Config
 				if (wcfg.isLogging(l))
 					superWorldConfig.setLogging(l, true);
 	}
-	
-	// Mywk
-	public static Set<Integer> getCustomBlockIds() {
-		return customBlockIds;
-	}
-
 
 	private static String getStringIncludingInts(ConfigurationSection cfg, String key) {
 		String str = cfg.getString(key);

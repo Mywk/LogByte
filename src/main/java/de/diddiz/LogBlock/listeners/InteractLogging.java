@@ -1,19 +1,22 @@
 package de.diddiz.LogBlock.listeners;
 
 import static de.diddiz.LogBlock.config.Config.getWorldConfig;
-
 import de.diddiz.util.BukkitUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+
 import de.diddiz.LogBlock.LogBlock;
 import de.diddiz.LogBlock.Logging;
+import de.diddiz.LogBlock.config.Config;
 import de.diddiz.LogBlock.config.WorldConfig;
 
 public class InteractLogging extends LoggingListener
@@ -26,13 +29,59 @@ public class InteractLogging extends LoggingListener
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		final WorldConfig wcfg = getWorldConfig(event.getPlayer().getWorld());
 		if (wcfg != null) {
+			final Block originBlock = event.getClickedBlock();
+			final BlockFace face = event.getBlockFace();
+			final Player player = event.getPlayer();
+
 			final Block clicked = event.getClickedBlock();
+
+			
+			// Mywk wrench logging
+			if (wcfg.isLogging(Logging.WRENCH) && event.getAction() == Action.RIGHT_CLICK_BLOCK)
+			{
+				if(Config.wrenchIds.contains(player.getItemInHand().getTypeId()))
+				{
+					LogBlock.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(LogBlock.getInstance(), new Runnable() {
+	                    public void run() {
+	                        if(clicked.getTypeId() == 0)
+	                        {
+	                        	consumer.queueBlockBreak(player.getName(), originBlock.getState());
+	                        }
+	                        	
+	                    }
+	                  }, 2L); // 2 should be enough, more may cause the block not to be logged
+				}
+				
+				// Log Force Wrench place event
+				if(player.getItemInHand().getTypeId() == Config.forceWrenchPlaceId)
+				{	
+					
+					final Location where = clicked.getRelative(face).getLocation();
+					
+					LogBlock.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(LogBlock.getInstance(), new Runnable() {
+	                
+						public void run() {
+	                    	
+	                    	if(where.getBlock().getTypeId() != 0) // Not air
+	                    	{
+	                    		// Must be sure
+	                    		BlockState placedBlock = where.getBlock().getState();
+	                    		consumer.queueBlockPlace(player.getName(), placedBlock);
+	                    	}
+	                        	
+	                    }
+	                  }, 1L);
+                    	
+				}
+				
+				
+			}
+			
 			final Material type = clicked.getType();
 			final int typeId = type.getId();
 			final byte blockData = clicked.getData();
-			final Player player = event.getPlayer();
 			final Location loc = clicked.getLocation();
-
+			
 			switch (type) {
 				case LEVER:
 				case WOOD_BUTTON:

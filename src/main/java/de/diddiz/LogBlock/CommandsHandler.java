@@ -7,6 +7,8 @@ import de.diddiz.LogBlock.config.Config;
 import de.diddiz.LogBlock.config.WorldConfig;
 import de.diddiz.LogBlockQuestioner.LogBlockQuestioner;
 import de.diddiz.util.Block;
+import de.diddiz.LogBlock.Consumer;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;

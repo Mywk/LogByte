@@ -1,7 +1,9 @@
 package de.diddiz.LogBlock.listeners;
 
-import org.bukkit.event.Listener;
 import de.diddiz.LogBlock.Consumer;
+
+import org.bukkit.event.Listener;
+
 import de.diddiz.LogBlock.LogBlock;
 
 public class LoggingListener implements Listener

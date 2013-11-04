@@ -56,7 +56,7 @@ public class ChestAccessLogging extends LoggingListener
 								
 				Location loc = getInventoryHolderLocation(holder);
 				int itemTypeId = 0;
-				if (!(holder instanceof BlockState || holder instanceof DoubleChest) && Config.getCustomBlockIds().contains(event.getPlayer().getTargetBlock(null,200).getTypeId()))
+				if (!(holder instanceof BlockState || holder instanceof DoubleChest) && Config.customBlockIds.contains(event.getPlayer().getTargetBlock(null,200).getTypeId()))
 				{
 					loc = event.getPlayer().getTargetBlock(null,200).getLocation();
 				}
@@ -88,7 +88,7 @@ public class ChestAccessLogging extends LoggingListener
 			InventoryHolder holder = event.getInventory().getHolder();
 
 			// Screw this too.
-			if (holder instanceof BlockState || holder instanceof DoubleChest || Config.getCustomBlockIds().contains(event.getPlayer().getTargetBlock(null,200).getTypeId())) 
+			if (holder instanceof BlockState || holder instanceof DoubleChest || Config.customBlockIds.contains(event.getPlayer().getTargetBlock(null,200).getTypeId())) 
 			{
 				//test
 				//java.util.ListIterator<ItemStack> x = event.getInventory().iterator();
