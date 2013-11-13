@@ -59,6 +59,12 @@ public class Consumer extends TimerTask
 		queueBlockBreak(playerName, new Location(before.getWorld(), before.getX(), before.getY(), before.getZ()), before.getTypeId(), before.getRawData());
 	}
 
+	// Mywk
+	public void queueBlockBreakDelayed(String playerName, Location loc, int id, byte data) {
+		queueBlockBreak(playerName, loc, id, data);
+	}
+
+	
 	/**
 	 * Logs a block break. The block type afterwards is assumed to be o (air).
 	 */

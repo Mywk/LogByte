@@ -4,7 +4,7 @@
  
     <groupId>de.diddiz</groupId>
     <artifactId>logblock</artifactId>
-    <version>release</version>
+    <version>2.07-RELEASE</version>
     <packaging>jar</packaging>
  
     <name>LogBlock</name>
