@@ -39,12 +39,12 @@ public class InteractLogging extends LoggingListener
 		final WorldConfig wcfg = getWorldConfig(event.getPlayer().getWorld());
 		if (wcfg != null) {
 			
-			final Player player = event.getPlayer();
-			final Block clicked = event.getClickedBlock();	
-			
 			// Mywk wrench logging
 			if (wcfg.isLogging(Logging.WRENCH) && event.getAction() == Action.RIGHT_CLICK_BLOCK)
 			{
+				final Player player = event.getPlayer();
+				final Block clicked = event.getClickedBlock();	
+				
 				if(Config.wrenchIds.contains(player.getItemInHand().getTypeId()))
 				{
 					final BlockState state = clicked.getState();
@@ -93,6 +93,8 @@ public class InteractLogging extends LoggingListener
 			if(wcfg.isLogging(Logging.SWITCHINTERACT) || wcfg.isLogging(Logging.DOORINTERACT) || wcfg.isLogging(Logging.CAKEEAT) || wcfg.isLogging(Logging.NOTEBLOCKINTERACT) || wcfg.isLogging(Logging.DIODEINTERACT) || wcfg.isLogging(Logging.COMPARATORINTERACT) || wcfg.isLogging(Logging.PRESUREPLATEINTERACT) || wcfg.isLogging(Logging.TRIPWIREINTERACT) || wcfg.isLogging(Logging.CROPTRAMPLE))
 			{
 			
+				final Player player = event.getPlayer();
+				final Block clicked = event.getClickedBlock();	
 				final Material type = clicked.getType();
 				final int typeId = type.getId();
 				final byte blockData = clicked.getData();
