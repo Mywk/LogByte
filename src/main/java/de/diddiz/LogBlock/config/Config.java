@@ -26,6 +26,9 @@ public class Config
 	public static Set<Integer> wrenchIds;
 	public static int forceWrenchPlaceId;
 	public static boolean wrenchLog;
+	public static boolean powertoolLog;
+	public static int powertoolId;
+	public static int luxcapacitorId;
 
 	private static LoggingEnabledMapping superWorldConfig;
 	private static Map<String, WorldConfig> worldConfigs;
@@ -84,7 +87,10 @@ public class Config
 		def.put("consumer.useBukkitScheduler", true);
 		def.put("consumer.queueWarningSize", 1000);
 		def.put("wrenchLog", true);
+		def.put("powertoolLog", true);
 		def.put("forceWrenchPlaceId", 6304);
+		def.put("powertoolId", 25031);
+		def.put("luxcapacitorId", 2478);
 		def.put("clearlog.dumpDeletedLog", false);
 		def.put("clearlog.enableAutoClearLog", false);
 		def.put("clearlog.auto", Arrays.asList("world \"world\" before 365 days all", "world \"world\" player lavaflow waterflow leavesdecay before 7 days all", "world world_nether before 365 days all", "world world_nether player lavaflow before 7 days all"));
@@ -191,6 +197,7 @@ public class Config
 		askRollbacks = config.getBoolean("questioner.askRollbacks", true);
 		askRedos = config.getBoolean("questioner.askRedos", true);
 		wrenchLog = config.getBoolean("wrenchLog",true);
+		powertoolLog = config.getBoolean("powertoolLog",true);
 		askClearLogs = config.getBoolean("questioner.askClearLogs", true);
 		askClearLogAfterRollback = config.getBoolean("questioner.askClearLogAfterRollback", true);
 		askRollbackAfterBan = config.getBoolean("questioner.askRollbackAfterBan", false);
@@ -229,6 +236,8 @@ public class Config
 		customBlockIds = new HashSet<Integer>(config.getIntegerList("customBlockIds"));
 		wrenchIds = new HashSet<Integer>(config.getIntegerList("wrenchIds"));
 		forceWrenchPlaceId = config.getInt("forceWrenchPlaceId", 6304);
+		powertoolId = config.getInt("powertoolId", 25031);
+		luxcapacitorId = config.getInt("luxcapacitorId", 2478);
 		
 		final List<String> loggedWorlds = config.getStringList("loggedWorlds");
 		worldConfigs = new HashMap<String, WorldConfig>();

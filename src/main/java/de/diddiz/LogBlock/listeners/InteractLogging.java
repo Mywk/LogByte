@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
 
 import de.diddiz.LogBlock.LogBlock;
 import de.diddiz.LogBlock.Logging;
@@ -33,18 +34,22 @@ public class InteractLogging extends LoggingListener
 	public InteractLogging(LogBlock lb) {
 		super(lb);
 	}
+	
+	// !!!!!! TO ADD, POWER DRILL AREA
+	
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		final WorldConfig wcfg = getWorldConfig(event.getPlayer().getWorld());
 		if (wcfg != null) {
 			
-			// Mywk wrench logging
-			if (wcfg.isLogging(Logging.WRENCH) && event.getAction() == Action.RIGHT_CLICK_BLOCK)
+			// Mywk wrench and powertool logging, ignores world settings (logs all worlds)
+			if (Config.wrenchLog && event.getAction() == Action.RIGHT_CLICK_BLOCK)
 			{
 				final Player player = event.getPlayer();
 				final Block clicked = event.getClickedBlock();	
 				
+
 				if(Config.wrenchIds.contains(player.getItemInHand().getTypeId()))
 				{
 					final BlockState state = clicked.getState();
@@ -161,4 +166,43 @@ public class InteractLogging extends LoggingListener
 			}
 		}
 	}
+	
+	// This is specific for the Lux capacitor
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+	public void onPlayerInteractAir(PlayerInteractEvent event) {
+		
+		if (Config.powertoolLog && (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR))
+		{
+
+			if(event.getPlayer().getItemInHand().getTypeId() == Config.powertoolId)
+			{
+		
+				final Location loc = event.getPlayer().getTargetBlock(null, 110).getLocation();
+				final Player player = event.getPlayer();
+				
+				LogBlock.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(LogBlock.getInstance(), new Runnable() {
+		            public void run() {
+		
+		        		// Lets not overload the server with Math and foreach the BlockFaces          
+		        		//(float)Math.toDegrees(Math.atan2(event.getPlayer().getLocation().getBlockX() - theBlock.getX(), theBlock.getZ() - event.getPlayer().getLocation().getBlockZ()));
+		        	
+		            	Block theBlock = loc.getBlock();
+
+		            	for (BlockFace f : BlockFace.values()) {
+		            		if(theBlock.getRelative(f).getTypeId() == Config.luxcapacitorId)
+		            		{
+		            			consumer.queueBlockPlace(player.getName(), theBlock.getRelative(f).getLocation(), theBlock.getRelative(f).getState().getTypeId(),theBlock.getRelative(f).getState().getRawData());
+		            			break;
+		            		}
+		            	}
+		                	
+		            }
+		          }, 600L); // check 30 seconds later (600 ticks), max time the lux capacitor needs to travel, won't also log if player removes it within the time left
+				
+			}
+
+	}
+	}
+	
+	
 }
