@@ -4,16 +4,21 @@ import static de.diddiz.LogBlock.config.Config.getWorldConfig;
 import static de.diddiz.LogBlock.config.Config.isLogging;
 import static de.diddiz.util.LoggingUtil.smartLogBlockBreak;
 import static de.diddiz.util.LoggingUtil.smartLogFallables;
+
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
+
 import de.diddiz.LogBlock.LogBlock;
 import de.diddiz.LogBlock.Logging;
+import de.diddiz.LogBlock.config.Config;
 import de.diddiz.LogBlock.config.WorldConfig;
 import de.diddiz.util.BukkitUtils;
 
@@ -46,12 +51,21 @@ public class BlockBreakLogging extends LoggingListener
 				} else {
 					consumer.queueBlockReplace(playerName, origin.getState(), 9, (byte) 0);
 				}
-			} else {
+			}
+			// Force powertool log even on hidden blocks
+			else if (Config.forcepowerdrillLog && event.getPlayer().getItemInHand().getTypeId() == Config.powerdrillId)
+			{
+				// Log the middle block only to avoid block calculation lag and a huge list of logs
+				org.bukkit.block.BlockState before = origin.getState();
+				consumer.queueBlockForce(playerName, new Location(before.getWorld(), before.getX(), before.getY(), before.getZ()), before.getTypeId(), 0, before.getRawData(), null, null);
+
+			}
+			else {
 				smartLogBlockBreak(consumer, playerName, origin);
 			}
 			smartLogFallables(consumer, playerName, origin);
 			
-			// Just testing
+			// Debug
 			//System.out.println("Material type:" + type.toString() + " | " + "TypeId:" + typeId);
 		}
 	}

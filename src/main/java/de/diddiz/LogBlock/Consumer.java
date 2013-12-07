@@ -2,8 +2,11 @@ package de.diddiz.LogBlock;
 
 import de.diddiz.LogBlock.config.Config;
 import de.diddiz.LogBlock.events.BlockChangePreLogEvent;
+
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
@@ -33,6 +36,11 @@ public class Consumer extends TimerTask
 	private final LogBlock logblock;
 	private final Map<String, Integer> playerIds = new HashMap<String, Integer>();
 	private final Lock lock = new ReentrantLock();
+	
+	// Every player needs a lastClickedBlock entry, this will reduce lag since we stop
+	// using the player.getTargetBlock(null,200), also makes the logging precise and
+	// not hack'able (player could use a mod to interact with blocks without looking at it)
+	static public final HashMap<Player, Block> lastClickedBlock = new HashMap<Player, Block>();
 
 	Consumer(LogBlock logblock) {
 		this.logblock = logblock;
@@ -401,6 +409,25 @@ public class Consumer extends TimerTask
 		if (playerName == null || loc == null || typeBefore < 0 || typeAfter < 0 || (Config.safetyIdCheck && (typeBefore > 255 || typeAfter > 255)) || hiddenPlayers.contains(playerName.toLowerCase()) || !isLogged(loc.getWorld()) || typeBefore != typeAfter && hiddenBlocks.contains(typeBefore) && hiddenBlocks.contains(typeAfter)) return;
 		queue.add(new BlockRow(loc, playerName.replaceAll("[^a-zA-Z0-9_]", ""), typeBefore, typeAfter, data, signtext, ca));
 	}
+	
+	// I'm lazy today, copy-paste is quicker
+	public void queueBlockForce(String playerName, Location loc, int typeBefore, int typeAfter, byte data, String signtext, ChestAccess ca) {
+
+		if (Config.fireCustomEvents) {
+			BlockChangePreLogEvent event = new BlockChangePreLogEvent(playerName, loc, typeBefore, typeAfter, data, signtext, ca);
+			logblock.getServer().getPluginManager().callEvent(event);
+			if (event.isCancelled()) return;
+			playerName = event.getOwner();
+			loc = event.getLocation();
+			typeBefore = event.getTypeBefore();
+			typeAfter = event.getTypeAfter();
+			data = event.getData();
+			signtext = event.getSignText();
+			ca = event.getChestAccess();
+		}
+		if (playerName == null || loc == null || typeBefore < 0 || typeAfter < 0 || (Config.safetyIdCheck && (typeBefore > 255 || typeAfter > 255)) || hiddenPlayers.contains(playerName.toLowerCase()) || !isLogged(loc.getWorld())) return;
+		queue.add(new BlockRow(loc, playerName.replaceAll("[^a-zA-Z0-9_]", ""), typeBefore, typeAfter, data, signtext, ca));
+	}
 
 	private String playerID(String playerName) {
 		if (playerName == null)
@@ -627,6 +654,7 @@ public class Consumer extends TimerTask
 			playerName = player.getName();
 			lastLogin = System.currentTimeMillis() / 1000;
 			ip = player.getAddress().toString().replace("'", "\\'");
+			lastClickedBlock.put(player, null);
 		}
 
 		@Override
@@ -648,6 +676,8 @@ public class Consumer extends TimerTask
 		PlayerLeaveRow(Player player) {
 			playerName = player.getName();
 			leaveTime = System.currentTimeMillis() / 1000;
+			// Memory cleanup, no need to waste resources
+			lastClickedBlock.remove(player);
 		}
 
 		@Override

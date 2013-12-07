@@ -1,6 +1,7 @@
 package de.diddiz.LogBlock.listeners;
 
 import static de.diddiz.LogBlock.config.Config.getWorldConfig;
+import static de.diddiz.util.LoggingUtil.smartLogBlockBreak;
 
 import java.util.List;
 
@@ -43,12 +44,12 @@ public class InteractLogging extends LoggingListener
 		final WorldConfig wcfg = getWorldConfig(event.getPlayer().getWorld());
 		if (wcfg != null) {
 			
-			// Mywk wrench and powertool logging, ignores world settings (logs all worlds)
+			final Player player = event.getPlayer();
+			final Block clicked = event.getClickedBlock();	
+			
+			// Mywk wrench and powertool logging
 			if (Config.wrenchLog && event.getAction() == Action.RIGHT_CLICK_BLOCK)
-			{
-				final Player player = event.getPlayer();
-				final Block clicked = event.getClickedBlock();	
-				
+			{	
 
 				if(Config.wrenchIds.contains(player.getItemInHand().getTypeId()))
 				{
@@ -59,14 +60,14 @@ public class InteractLogging extends LoggingListener
 					final byte b = state.getRawData();
 					
 					LogBlock.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(LogBlock.getInstance(), new Runnable() {
-	                    public void run() {
-	                        if(clicked.getTypeId() == 0)
-	                        {
-	                        	consumer.queueBlockBreakDelayed(player.getName(), loc, id,b);
-	                        }
-	                        	
-	                    }
-	                  }, 2L); // 2 should be enough, more may cause the block not to be logged
+			            public void run() {
+			                if(clicked.getTypeId() == 0)
+			                {
+			                	consumer.queueBlockBreakDelayed(player.getName(), loc, id,b);
+			                }
+			                	
+			            }
+			          }, 2L); // 2 should be enough, more may cause the block not to be logged	
 				}
 				
 				// Log Force Wrench place event
@@ -98,8 +99,6 @@ public class InteractLogging extends LoggingListener
 			if(wcfg.isLogging(Logging.SWITCHINTERACT) || wcfg.isLogging(Logging.DOORINTERACT) || wcfg.isLogging(Logging.CAKEEAT) || wcfg.isLogging(Logging.NOTEBLOCKINTERACT) || wcfg.isLogging(Logging.DIODEINTERACT) || wcfg.isLogging(Logging.COMPARATORINTERACT) || wcfg.isLogging(Logging.PRESUREPLATEINTERACT) || wcfg.isLogging(Logging.TRIPWIREINTERACT) || wcfg.isLogging(Logging.CROPTRAMPLE))
 			{
 			
-				final Player player = event.getPlayer();
-				final Block clicked = event.getClickedBlock();	
 				final Material type = clicked.getType();
 				final int typeId = type.getId();
 				final byte blockData = clicked.getData();
@@ -167,18 +166,25 @@ public class InteractLogging extends LoggingListener
 		}
 	}
 	
-	// This is specific for the Lux capacitor
+	// This is very important, handles the lastClickedBlock. Also logs the Lux capacitor placing
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void onPlayerInteractAir(PlayerInteractEvent event) {
 		
-		if (Config.powertoolLog && (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR))
+		// Extremely important
+		if(!event.isCancelled() && event.getAction() == Action.RIGHT_CLICK_BLOCK)
+			consumer.lastClickedBlock.put(event.getPlayer(), event.getClickedBlock());
+
+		
+		if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)
 		{
 
-			if(event.getPlayer().getItemInHand().getTypeId() == Config.powertoolId)
+			if(Config.powertoolId > 0 && event.getPlayer().getItemInHand().getTypeId() == Config.powertoolId)
 			{
 		
 				final Location loc = event.getPlayer().getTargetBlock(null, 110).getLocation();
 				final Player player = event.getPlayer();
+				if(loc.getBlock().getType() == Material.AIR) // Air? No need to continue then
+					return;
 				
 				LogBlock.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(LogBlock.getInstance(), new Runnable() {
 		            public void run() {
@@ -200,9 +206,34 @@ public class InteractLogging extends LoggingListener
 		          }, 600L); // check 30 seconds later (600 ticks), max time the lux capacitor needs to travel, won't also log if player removes it within the time left
 				
 			}
+			// This is a test version, I don't feel like implementing the IC2 EntityMiningLaser so this is better than nothing
+			else if(Config.mininglaserId > 0 && event.getPlayer().getItemInHand().getTypeId() == Config.mininglaserId)
+			{
+		
+				final Location loc = event.getPlayer().getTargetBlock(null, 140).getLocation();
+				final Player player = event.getPlayer();
+				final BlockState state = loc.getBlock().getState();
+				final int id = state.getTypeId();
+				final byte b = state.getRawData();
+				
+				if(loc.getBlock().getType() == Material.AIR)
+					return;
+				
+				LogBlock.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(LogBlock.getInstance(), new Runnable() {
+		            public void run() {
+
+		            	if(loc.getBlock().getType() == Material.AIR){
+		            			consumer.queueBlockBreakDelayed(player.getName(), loc, id,b);
+		            	System.out.println("ADDED");
+		            	}
+		            }
+		          }, 100L); // check 5 seconds later
+				
+			}
 
 	}
 	}
+	
 	
 	
 }

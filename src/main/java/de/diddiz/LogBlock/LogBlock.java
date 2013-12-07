@@ -17,6 +17,7 @@ import de.diddiz.LogBlock.listeners.KillLogging;
 import de.diddiz.LogBlock.listeners.LeavesDecayLogging;
 import de.diddiz.LogBlock.listeners.LockedChestDecayLogging;
 import de.diddiz.LogBlock.listeners.PlayerInfoLogging;
+import de.diddiz.LogBlock.listeners.ProjectileHitLogging;
 import de.diddiz.LogBlock.listeners.SignChangeLogging;
 import de.diddiz.LogBlock.listeners.SnowFadeLogging;
 import de.diddiz.LogBlock.listeners.SnowFormLogging;
@@ -150,6 +151,8 @@ public class LogBlock extends JavaPlugin
         private void registerEvents() {
                 final PluginManager pm = getPluginManager();
                 pm.registerEvents(new ToolListener(this), this);
+                // Possible future use
+                //pm.registerEvents(new ProjectileHitLogging(this), this);
                 if (askRollbackAfterBan)
                         pm.registerEvents(new BanListener(this), this);
                 if (isLogging(Logging.BLOCKPLACE))
