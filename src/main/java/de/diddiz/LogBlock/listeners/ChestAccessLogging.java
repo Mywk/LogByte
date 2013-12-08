@@ -110,7 +110,7 @@ public class ChestAccessLogging extends LoggingListener
                         	{
                                 containers.put(event.getPlayer(), compressInventory(event.getInventory().getContents()));
                         	}
-                        	catch(NullPointerException e)
+                        	catch(Exception e)
                         	{        	
                         		if(Config.logAllMachines)
                         			specialContainers.put(event.getPlayer(), compressInventory(event.getPlayer().getInventory().getContents()));
