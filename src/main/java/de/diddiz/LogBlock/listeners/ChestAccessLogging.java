@@ -9,6 +9,7 @@ import static de.diddiz.util.BukkitUtils.rawData;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.diddiz.LogBlock.Logging;
@@ -19,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -104,8 +106,8 @@ public class ChestAccessLogging extends LoggingListener
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onInventoryOpen(InventoryOpenEvent event) {
 		if (!isLogging(event.getPlayer().getWorld(), Logging.CHESTACCESS)) return;
-		
-		if(event.getPlayer() == null || ! Arrays.asList(Bukkit.getOnlinePlayers()).contains(event.getPlayer().getName()))
+
+		if(event.getPlayer() == null || !(Arrays.asList(Bukkit.getOnlinePlayers()).contains(event.getPlayer())))
 		return;
 		
         if (event.getInventory() != null) {
