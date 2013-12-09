@@ -7,11 +7,13 @@ import static de.diddiz.util.BukkitUtils.getInventoryHolderLocation;
 import static de.diddiz.util.BukkitUtils.getInventoryHolderType;
 import static de.diddiz.util.BukkitUtils.rawData;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.diddiz.LogBlock.Logging;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
@@ -102,6 +104,10 @@ public class ChestAccessLogging extends LoggingListener
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onInventoryOpen(InventoryOpenEvent event) {
 		if (!isLogging(event.getPlayer().getWorld(), Logging.CHESTACCESS)) return;
+		
+		if(event.getPlayer() == null || ! Arrays.asList(Bukkit.getOnlinePlayers()).contains(event.getPlayer().getName()))
+		return;
+		
         if (event.getInventory() != null) {
                 InventoryHolder holder = event.getInventory().getHolder();
                 if (holder instanceof BlockState || holder instanceof DoubleChest || Config.customBlockIds.contains(consumer.lastClickedBlock.get(event.getPlayer()).getTypeId())) {
@@ -110,7 +116,7 @@ public class ChestAccessLogging extends LoggingListener
                         	{
                                 containers.put(event.getPlayer(), compressInventory(event.getInventory().getContents()));
                         	}
-                        	catch(Exception e)
+                        	catch(java.lang.AbstractMethodError | Exception e)
                         	{        	
                         		if(Config.logAllMachines)
                         			specialContainers.put(event.getPlayer(), compressInventory(event.getPlayer().getInventory().getContents()));
