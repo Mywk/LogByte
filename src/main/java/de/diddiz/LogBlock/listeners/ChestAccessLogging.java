@@ -50,8 +50,6 @@ public class ChestAccessLogging extends LoggingListener
 
 		if (!isLogging(event.getPlayer().getWorld(), Logging.CHESTACCESS)) return;
 		InventoryHolder holder = event.getInventory().getHolder();
-		// Nop, screw this line! just log all machines with an inventory :)
-		//if (holder instanceof BlockState || holder instanceof DoubleChest) 
 		{
 			final HumanEntity player = event.getPlayer();
 			final ItemStack[] specialBefore = specialContainers.get(player);
@@ -74,19 +72,14 @@ public class ChestAccessLogging extends LoggingListener
 			else if (before != null) {
 				final ItemStack[] after = compressInventory(event.getInventory().getContents());
 				final ItemStack[] diff = compareInventories(before, after);
-				
-				// Some machines with inventory may not report their location correctly
-				// (Like IronChests mod) so instead of fixing every single of these mods
-				// we will just add ChestAccess to the block the player is looking at.
-				// (HotFix also implemented in BukkitUtils.java)		
+						
 				Location loc = getInventoryHolderLocation(holder);
-				int itemTypeId = 0;
-				if (!(holder instanceof BlockState || holder instanceof DoubleChest) && Config.customBlockIds.contains(event.getPlayer().getTargetBlock(null,200).getTypeId()))
+				if (!(holder instanceof BlockState || holder instanceof DoubleChest))
 				{
-					loc = event.getPlayer().getTargetBlock(null,200).getLocation();
+					loc = consumer.lastClickedBlock.get(event.getPlayer()).getLocation();
 				}
 				
-				itemTypeId = loc.getWorld().getBlockTypeIdAt(loc);
+				int itemTypeId = consumer.lastClickedBlock.get(event.getPlayer()).getTypeId();
 				// Safety check
 				if(itemTypeId != 0 && loc != null)
 				{
@@ -99,10 +92,6 @@ public class ChestAccessLogging extends LoggingListener
 		}
 	}
 	
-	// ToDo: Implement own PlayerInfo so instead of using player.getTargetBlock(null,200)
-	// we would use something like player.getLastClickedBlock, that would make the logging
-	// even more precise and not hack'able at all.
-
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onInventoryOpen(InventoryOpenEvent event) {
 		if (!isLogging(event.getPlayer().getWorld(), Logging.CHESTACCESS)) return;
@@ -112,7 +101,7 @@ public class ChestAccessLogging extends LoggingListener
 		
         if (event.getInventory() != null) {
                 InventoryHolder holder = event.getInventory().getHolder();
-                if (holder instanceof BlockState || holder instanceof DoubleChest || Config.customBlockIds.contains(consumer.lastClickedBlock.get(event.getPlayer()).getTypeId())) {
+                if (holder instanceof BlockState || holder instanceof DoubleChest) {
                         if (getInventoryHolderType(holder) != 58) {
                         	try
                         	{

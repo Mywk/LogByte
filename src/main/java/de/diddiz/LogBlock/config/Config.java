@@ -22,7 +22,6 @@ import static org.bukkit.Bukkit.*;
 public class Config
 {
 	// Mywk
-	public static Set<Integer> customBlockIds;
 	public static Set<Integer> wrenchIds;
 	public static int forceWrenchPlaceId;
 	public static boolean wrenchLog;
@@ -59,6 +58,7 @@ public class Config
 	public static Set<String> ignoredChat;
 	public static SimpleDateFormat formatter;
 	public static boolean safetyIdCheck;
+	public static boolean logEnvironmentalKills;
 
 	public static enum LogKillsLevel
 	{
@@ -77,6 +77,7 @@ public class Config
 			worldNames.add("world_nether");
 			worldNames.add("world_the_end");
 		}
+		def.put("logEnvironmentalKills", false);
 		def.put("loggedWorlds", worldNames);
 		def.put("mysql.host", "localhost");
 		def.put("mysql.port", 3306);
@@ -90,12 +91,12 @@ public class Config
 		def.put("consumer.useBukkitScheduler", true);
 		def.put("consumer.queueWarningSize", 1000);
 		def.put("wrenchLog", true);
-		def.put("forcepowerdrillLog", true);
+		def.put("forcepowerdrillLog", false);
 		def.put("logAllMachines", true);
-		def.put("forceWrenchPlaceId", 6304);
+		def.put("forceWrenchPlaceId", -1);
 		def.put("powertoolId", 25031);
 		def.put("luxcapacitorId", 2478);
-		def.put("powerdrillId", 6273);
+		def.put("powerdrillId", -1);
 		def.put("mininglaserId", 30208);
 		def.put("clearlog.dumpDeletedLog", false);
 		def.put("clearlog.enableAutoClearLog", false);
@@ -116,11 +117,11 @@ public class Config
 		def.put("lookup.linesPerPage", 15);
 		def.put("lookup.linesLimit", 1500);
 		try {
-			formatter = new SimpleDateFormat(config.getString("lookup.dateFormat", "MM-dd HH:mm:ss"));
+			formatter = new SimpleDateFormat(config.getString("lookup.dateFormat", "dd/MM h:mma"));
 		} catch (IllegalArgumentException e) {
 			throw new DataFormatException("Invalid specification for  date format, please see http://docs.oracle.com/javase/1.4.2/docs/api/java/text/SimpleDateFormat.html : " + e.getMessage());
 		}
-		def.put("lookup.dateFormat", "MM-dd HH:mm:ss");
+		def.put("lookup.dateFormat", "dd/MM h:mma");
 		def.put("questioner.askRollbacks", true);
 		def.put("questioner.askRedos", true);
 		def.put("questioner.askClearLogs", true);
@@ -146,13 +147,8 @@ public class Config
 		def.put("tools.toolblock.mode", "LOOKUP");
 		def.put("tools.toolblock.permissionDefault", "OP");
 		def.put("safety.id.check", false);
-		// Mywk, default IronChests mod
-		def.put("customBlockIds", Arrays.asList(975));
-		for (final Entry<String, Object> e : def.entrySet())
-			if (!config.contains(e.getKey()))
-				config.set(e.getKey(), e.getValue());
-		// Mywk, default FTB Unleashed wrenches
-		def.put("wrenchIds", Arrays.asList(4370,5263,21997,19362,30183,11363,30140,6294));
+		// FTB wrenches
+		def.put("wrenchIds", Arrays.asList(0));
 		for (final Entry<String, Object> e : def.entrySet())
 			if (!config.contains(e.getKey()))
 				config.set(e.getKey(), e.getValue());
@@ -209,6 +205,7 @@ public class Config
 		askClearLogAfterRollback = config.getBoolean("questioner.askClearLogAfterRollback", true);
 		askRollbackAfterBan = config.getBoolean("questioner.askRollbackAfterBan", false);
 		safetyIdCheck = config.getBoolean("safety.id.check", true);
+		logEnvironmentalKills = config.getBoolean("logEnvironmentalKills", false);
 		banPermission = config.getString("questioner.banPermission");
 		final List<Tool> tools = new ArrayList<Tool>();
 		final ConfigurationSection toolsSec = config.getConfigurationSection("tools");
@@ -239,13 +236,13 @@ public class Config
 				toolsByName.put(alias, tool);
 		}
 		
-		// Mywk configs
-		customBlockIds = new HashSet<Integer>(config.getIntegerList("customBlockIds"));
+		// LogByte configs
+		logEnvironmentalKills = config.getBoolean("logEnvironmentalKills", false);
 		wrenchIds = new HashSet<Integer>(config.getIntegerList("wrenchIds"));
-		forceWrenchPlaceId = config.getInt("forceWrenchPlaceId", 6304);
+		forceWrenchPlaceId = config.getInt("forceWrenchPlaceId", -1);
 		powertoolId = config.getInt("powertoolId", 25031);
 		luxcapacitorId = config.getInt("luxcapacitorId", 2478);
-		powerdrillId = config.getInt("powerdrillId", 6273);
+		powerdrillId = config.getInt("powerdrillId", -1);
 		mininglaserId = config.getInt("mininglaserId", 30208);
 
 		final List<String> loggedWorlds = config.getStringList("loggedWorlds");

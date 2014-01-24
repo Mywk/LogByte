@@ -5,7 +5,6 @@ import de.diddiz.LogBlock.QueryParams.Order;
 import de.diddiz.LogBlock.QueryParams.SummarizationMode;
 import de.diddiz.LogBlock.config.Config;
 import de.diddiz.LogBlock.config.WorldConfig;
-import de.diddiz.LogBlockQuestioner.LogBlockQuestioner;
 import de.diddiz.util.Block;
 import de.diddiz.LogBlock.Consumer;
 
@@ -45,70 +44,67 @@ public class CommandsHandler implements CommandExecutor
 {
 	private final LogBlock logblock;
 	private final BukkitScheduler scheduler;
-	private final LogBlockQuestioner questioner;
 
 	CommandsHandler(LogBlock logblock) {
 		this.logblock = logblock;
 		scheduler = logblock.getServer().getScheduler();
-		questioner = (LogBlockQuestioner)logblock.getServer().getPluginManager().getPlugin("LogBlockQuestioner");
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		try {
 			if (args.length == 0) {
-				sender.sendMessage(ChatColor.LIGHT_PURPLE + "LogBlock v" + logblock.getDescription().getVersion() + " by DiddiZ, Modified by Mywk");
-				sender.sendMessage(ChatColor.LIGHT_PURPLE + "Type /lb help for help");
+				sender.sendMessage(ChatColor.AQUA + "LogByte v" + logblock.getDescription().getVersion() + " - by Mywk");
+				sender.sendMessage(ChatColor.AQUA + "Commands: /lb help");
 			} else {
 				final String command = args[0].toLowerCase();
 				if (command.equals("help")) {
-					sender.sendMessage(ChatColor.DARK_AQUA + "LogBlock Help:");
-					sender.sendMessage(ChatColor.GOLD + "For the commands list type '/lb commands'");
-					sender.sendMessage(ChatColor.GOLD + "For the parameters list type '/lb params'");
-					sender.sendMessage(ChatColor.GOLD + "For the list of permissions you got type '/lb permissions'");
+					sender.sendMessage(ChatColor.DARK_AQUA + "LogByte Help:");
+					sender.sendMessage(ChatColor.AQUA + "Commands list '/lb commands'");
+					sender.sendMessage(ChatColor.AQUA + "Parameters list '/lb params'");
+					sender.sendMessage(ChatColor.AQUA + "List permissions you got '/lb permissions'");
 				} else if (command.equals("commands")) {
-					sender.sendMessage(ChatColor.DARK_AQUA + "LogBlock Commands:");
-					//sender.sendMessage(ChatColor.GOLD + "/lb tool -- Gives you the lb tool");
-					//sender.sendMessage(ChatColor.GOLD + "/lb tool [on|off] -- Enables/Disables tool");
-					//sender.sendMessage(ChatColor.GOLD + "/lb tool [params] -- Sets the tool lookup query");
-					//sender.sendMessage(ChatColor.GOLD + "/lb tool default -- Sets the tool lookup query to default");
-					sender.sendMessage(ChatColor.GOLD + "/lb toolblock -- Analog to tool");
-					sender.sendMessage(ChatColor.GOLD + "/lb hide -- Hides you from log");
-					sender.sendMessage(ChatColor.GOLD + "/lb rollback [params] -- Rollback");
-					sender.sendMessage(ChatColor.GOLD + "/lb redo [params] -- Redo");
-					sender.sendMessage(ChatColor.GOLD + "/lb tp [params] -- Teleports you to the location of griefing");
-					sender.sendMessage(ChatColor.GOLD + "/lb writelogfile [params] -- Writes a log file");
-					sender.sendMessage(ChatColor.GOLD + "/lb lookup [params] -- Lookup");
-					sender.sendMessage(ChatColor.GOLD + "/lb prev|next -- Browse lookup result pages");
-					sender.sendMessage(ChatColor.GOLD + "/lb page -- Shows a specific lookup result page");
-					sender.sendMessage(ChatColor.GOLD + "/lb me -- Displays your stats");
-					sender.sendMessage(ChatColor.GOLD + "Look at github.com/LogBlock/LogBlock/wiki/Commands for the full commands reference");
+					sender.sendMessage(ChatColor.DARK_AQUA + "LogByte Commands:");
+					//sender.sendMessage(ChatColor.AQUA + "/lb tool"+ChatColor.WHITE+" Gives you the lb tool");
+					//sender.sendMessage(ChatColor.AQUA + "/lb tool [on|off]"+ChatColor.WHITE+" Enables/Disables tool");
+					//sender.sendMessage(ChatColor.AQUA + "/lb tool [params]"+ChatColor.WHITE+" Sets the tool lookup query");
+					//sender.sendMessage(ChatColor.AQUA + "/lb tool default"+ChatColor.WHITE+" Sets the tool lookup query to default");
+					sender.sendMessage(ChatColor.AQUA + "/lb toolblock"+ChatColor.WHITE+" Analog tool");
+					sender.sendMessage(ChatColor.AQUA + "/lb hide"+ChatColor.WHITE+" Hides you from log");
+					sender.sendMessage(ChatColor.AQUA + "/lb rollback [params]"+ChatColor.WHITE+" Rollback");
+					sender.sendMessage(ChatColor.AQUA + "/lb redo [params]"+ChatColor.WHITE+" Redo");
+					sender.sendMessage(ChatColor.AQUA + "/lb tp [params]"+ChatColor.WHITE+" Teleports you to event location");
+					sender.sendMessage(ChatColor.AQUA + "/lb writelogfile [params]"+ChatColor.WHITE+" Writes a log file");
+					sender.sendMessage(ChatColor.AQUA + "/lb lookup [params]"+ChatColor.WHITE+" Lookup");
+					sender.sendMessage(ChatColor.AQUA + "/lb prev|next"+ChatColor.WHITE+" Browse lookup result pages");
+					sender.sendMessage(ChatColor.AQUA + "/lb page"+ChatColor.WHITE+" Shows a specific lookup result page");
+					sender.sendMessage(ChatColor.AQUA + "/lb me"+ChatColor.WHITE+" Displays your stats");
+					sender.sendMessage(ChatColor.AQUA + "Full commands reference: http://bit.ly/1l68gLK");
 				} else if (command.equals("params")) {
-					sender.sendMessage(ChatColor.DARK_AQUA + "LogBlock Query Parameters:");
-					sender.sendMessage(ChatColor.GOLD + "Use doublequotes to escape a keyword: world \"world\"");
-					sender.sendMessage(ChatColor.GOLD + "player [name1] <name2> <name3> -- List of players");
-					sender.sendMessage(ChatColor.GOLD + "block [type1] <type2> <type3> -- List of block types");
-					sender.sendMessage(ChatColor.GOLD + "created, destroyed -- Show only created/destroyed blocks");
-					sender.sendMessage(ChatColor.GOLD + "chestaccess -- Show only chest accesses");
-					sender.sendMessage(ChatColor.GOLD + "area <radius> -- Area around you");
-					sender.sendMessage(ChatColor.GOLD + "selection, sel -- Inside current WorldEdit selection");
-					sender.sendMessage(ChatColor.GOLD + "world [worldname] -- Changes the world");
-					sender.sendMessage(ChatColor.GOLD + "time [number] [minutes|hours|days] -- Limits time");
-					sender.sendMessage(ChatColor.GOLD + "since <dd.MM.yyyy> <HH:mm:ss> -- Limits time to a fixed point");
-					sender.sendMessage(ChatColor.GOLD + "before <dd.MM.yyyy> <HH:mm:ss> -- Affects only blocks before a fixed time");
-					sender.sendMessage(ChatColor.GOLD + "limit <row count> -- Limits the result to count of rows");
-					sender.sendMessage(ChatColor.GOLD + "sum [none|blocks|players] -- Sums the result");
-					sender.sendMessage(ChatColor.GOLD + "asc, desc -- Changes the order of the displayed log");
-					sender.sendMessage(ChatColor.GOLD + "coords -- Shows coordinates for each block");
-					sender.sendMessage(ChatColor.GOLD + "silent -- Displays lesser messages");
+					sender.sendMessage(ChatColor.DARK_AQUA + "LogByte Query Parameters:");
+					sender.sendMessage(ChatColor.AQUA + "Use doublequotes to escape a keyword: world \"world\"");
+					sender.sendMessage(ChatColor.AQUA + "player [name1] <name2> <name3>"+ChatColor.WHITE+" List of players");
+					sender.sendMessage(ChatColor.AQUA + "block [type1] <type2> <type3>"+ChatColor.WHITE+" List of block types");
+					sender.sendMessage(ChatColor.AQUA + "created, destroyed"+ChatColor.WHITE+" Show only created/destroyed blocks");
+					sender.sendMessage(ChatColor.AQUA + "chestaccess"+ChatColor.WHITE+" Show only chest accesses");
+					sender.sendMessage(ChatColor.AQUA + "area <radius>"+ChatColor.WHITE+" Area around you");
+					sender.sendMessage(ChatColor.AQUA + "selection, sel"+ChatColor.WHITE+" Inside current WorldEdit selection");
+					sender.sendMessage(ChatColor.AQUA + "world [worldname]"+ChatColor.WHITE+" Changes the world");
+					sender.sendMessage(ChatColor.AQUA + "time [number] [minutes|hours|days]"+ChatColor.WHITE+" Limits time");
+					sender.sendMessage(ChatColor.AQUA + "since <dd.MM.yyyy> <HH:mm:ss>"+ChatColor.WHITE+" Limits time to a fixed point");
+					sender.sendMessage(ChatColor.AQUA + "before <dd.MM.yyyy> <HH:mm:ss>"+ChatColor.WHITE+" Affects only blocks before a fixed time");
+					sender.sendMessage(ChatColor.AQUA + "limit <row count>"+ChatColor.WHITE+" Limits the result to count of rows");
+					sender.sendMessage(ChatColor.AQUA + "sum [none|blocks|players]"+ChatColor.WHITE+" Sums the result");
+					sender.sendMessage(ChatColor.AQUA + "asc, desc"+ChatColor.WHITE+" Change the order of the displayed log");
+					sender.sendMessage(ChatColor.AQUA + "coords"+ChatColor.WHITE+" Shows coordinates of event");
 				} else if (command.equals("permissions")) {
 					sender.sendMessage(ChatColor.DARK_AQUA + "You've got the following permissions:");
 					for (final String permission : new String[]{"me", "lookup", "tp", "rollback", "clearlog", "hide", "ignoreRestrictions", "spawnTools"})
 						if (logblock.hasPermission(sender, "logblock." + permission))
-							sender.sendMessage(ChatColor.GOLD + "logblock." + permission);
+							sender.sendMessage(ChatColor.AQUA + "logblock." + permission);
 					for (final Tool tool : toolsByType.values())
 						if (logblock.hasPermission(sender, "logblock.tools." + tool.name))
-							sender.sendMessage(ChatColor.GOLD + "logblock.tools." + tool.name);
+							sender.sendMessage(ChatColor.AQUA + "logblock.tools." + tool.name);
 				} else if (command.equals("logging")) {
 					if (logblock.hasPermission(sender, "logblock.lookup")) {
 						World world = null;
@@ -124,7 +120,7 @@ public class CommandsHandler implements CommandExecutor
 								for (final Logging l : Logging.values())
 									if (wcfg.isLogging(l))
 										logging.add(l.toString());
-								sender.sendMessage(ChatColor.GOLD + listing(logging, ", ", " and "));
+								sender.sendMessage(ChatColor.AQUA + listing(logging, ", ", " and "));
 							} else {
 								sender.sendMessage(ChatColor.RED + "World not logged: '" + world.getName() + "'");
 								sender.sendMessage(ChatColor.LIGHT_PURPLE + "Make the world name is listed at loggedWorlds in config. World names are case sensitive and must contains the path (if any), exactly like in the message above.");
@@ -133,7 +129,7 @@ public class CommandsHandler implements CommandExecutor
 							sender.sendMessage(ChatColor.RED + "No world specified");
 					} else
 						sender.sendMessage(ChatColor.RED + "You aren't allowed to do this.");
-				}else if (toolsByName.get(command) != null) {
+				} else if (toolsByName.get(command) != null) {
 					final Tool tool = toolsByName.get(command);
 					if (logblock.hasPermission(sender, "logblock.tools." + tool.name)) {
 						if (sender instanceof Player) {
@@ -236,8 +232,7 @@ public class CommandsHandler implements CommandExecutor
 						new CommandRedo(sender, params, true);
 					} else
 						sender.sendMessage(ChatColor.RED + "You aren't allowed to do this.");
-				}
-				 else if (command.equals("me")) {
+				} else if (command.equals("me")) {
 					if (sender instanceof Player) {
 						if (logblock.hasPermission(sender, "logblock.me")) {
 							final Player player = (Player)sender;
@@ -328,7 +323,7 @@ public class CommandsHandler implements CommandExecutor
 				if (numberOfPages != 1)
 					sender.sendMessage(ChatColor.DARK_AQUA + "Page " + page + "/" + numberOfPages);
 				for (int i = startpos; i <= stoppos; i++)
-					sender.sendMessage(ChatColor.GOLD + (session.lookupCache[i].getLocation() != null ? "(" + (i + 1) + ") " : "") + session.lookupCache[i].getMessage());
+					sender.sendMessage(ChatColor.AQUA + (session.lookupCache[i].getLocation() != null ? "(" + (i + 1) + ") " : "") + session.lookupCache[i].getMessage());
 				session.page = page;
 			} else
 				sender.sendMessage(ChatColor.RED + "There isn't a page '" + page + "'");
@@ -409,7 +404,7 @@ public class CommandsHandler implements CommandExecutor
 					params.needPlayer = true;
 					if (params.types.isEmpty() || Block.inList(params.types, 63) || Block.inList(params.types, 68))
 						params.needSignText = true;
-					if (params.bct == BlockChangeType.CHESTACCESS || params.types.isEmpty() || Block.inList(params.types, 23) || Block.inList(params.types, 54) || Block.inList(params.types, 61) || Block.inList(params.types, 62))
+					if (params.bct == BlockChangeType.CHESTACCESS || params.bct == BlockChangeType.ALL)
 						params.needChestAccess = true;
 				}
 				conn = logblock.getConnection();
@@ -431,9 +426,9 @@ public class CommandsHandler implements CommandExecutor
 						sender.sendMessage(ChatColor.DARK_AQUA.toString() + blockchanges.size() + " changes found." + (blockchanges.size() == linesLimit ? " Use 'limit -1' to see all changes." : ""));
 					if (params.sum != SummarizationMode.NONE)
 						if (params.bct == BlockChangeType.KILLS && params.sum == SummarizationMode.PLAYERS)
-							sender.sendMessage(ChatColor.GOLD + "Kills - Killed - Player");
+							sender.sendMessage(ChatColor.AQUA + "Kills - Killed - Player");
 						else
-							sender.sendMessage(ChatColor.GOLD + "Created - Destroyed - " + (params.sum == SummarizationMode.TYPES ? "Block" : "Player"));
+							sender.sendMessage(ChatColor.AQUA + "Created - Destroyed - " + (params.sum == SummarizationMode.TYPES ? "Block" : "Player"));
 					showPage(sender, 1);
 				} else {
 					sender.sendMessage(ChatColor.DARK_AQUA + "No results found.");
@@ -469,7 +464,7 @@ public class CommandsHandler implements CommandExecutor
 					params.needPlayer = true;
 					if (params.types.isEmpty() || Block.inList(params.types, 63) || Block.inList(params.types, 68))
 						params.needSignText = true;
-					if (params.types.isEmpty() || Block.inList(params.types, 23) || Block.inList(params.types, 54) || Block.inList(params.types, 61) || Block.inList(params.types, 62))
+					if (params.bct == BlockChangeType.CHESTACCESS || params.bct == BlockChangeType.ALL)
 						params.needChestAccess = true;
 				}
 				conn = logblock.getConnection();
@@ -541,9 +536,8 @@ public class CommandsHandler implements CommandExecutor
 		public void run() {
 			try {
 				params.needCoords = true;
-				if (params.bct == BlockChangeType.CHESTACCESS || params.types.isEmpty() || Block.inList(params.types, 23) || Block.inList(params.types, 54) || Block.inList(params.types, 61) || Block.inList(params.types, 62)) {
+				if (params.bct == BlockChangeType.CHESTACCESS || params.bct == BlockChangeType.ALL)
 					params.needChestAccess = true;
-				}
 				params.limit = 1;
 				params.sum = SummarizationMode.NONE;
 				conn = logblock.getConnection();
@@ -555,8 +549,8 @@ public class CommandsHandler implements CommandExecutor
 				rs = state.executeQuery(params.getQuery());
 				if (rs.next()) {
 					final Player player = (Player)sender;
-					final int y = rs.getInt(2);
-					final Location loc = new Location(params.world, rs.getInt(1) + 0.5, y, rs.getInt(3) + 0.5, player.getLocation().getYaw(), 90);
+					final int y = rs.getInt("y");
+					final Location loc = new Location(params.world, rs.getInt("x") + 0.5, y, rs.getInt("z") + 0.5, player.getLocation().getYaw(), 90);
 
 					// Teleport the player sync because omg thread safety
 					logblock.getServer().getScheduler().scheduleSyncDelayedTask(logblock, new Runnable() {
@@ -623,16 +617,16 @@ public class CommandsHandler implements CommandExecutor
 						sender.sendMessage(ChatColor.RED + "Rollback aborted");
 					return;
 				}
-				if (!params.silent && askRollbacks && questioner != null && sender instanceof Player && !questioner.ask((Player)sender, "Are you sure you want to continue?", "yes", "no").equals("yes")) {
+				if (!params.silent && askRollbacks && sender instanceof Player && !logblock.ask((Player)sender, "Are you sure you want to continue?", "yes", "no").equals("yes")) {
 					sender.sendMessage(ChatColor.RED + "Rollback aborted");
 					return;
 				}
 				editor.start();
 				getSession(sender).lookupCache = editor.errors;
 				sender.sendMessage(ChatColor.GREEN + "Rollback finished successfully (" + editor.getElapsedTime() + " ms, " + editor.getSuccesses() + "/" + changes + " blocks" + (editor.getErrors() > 0 ? ", " + ChatColor.RED + editor.getErrors() + " errors" + ChatColor.GREEN : "") + (editor.getBlacklistCollisions() > 0 ? ", " + editor.getBlacklistCollisions() + " blacklist collisions" : "") + ")");
-				if (!params.silent && askClearLogAfterRollback && logblock.hasPermission(sender, "logblock.clearlog") && questioner != null && sender instanceof Player) {
+				if (!params.silent && askClearLogAfterRollback && logblock.hasPermission(sender, "logblock.clearlog") && sender instanceof Player) {
 					Thread.sleep(1000);
-					if (questioner.ask((Player)sender, "Do you want to delete the rollbacked log?", "yes", "no").equals("yes")) {
+					if (logblock.ask((Player)sender, "Do you want to delete the rollbacked log?", "yes", "no").equals("yes")) {
 						params.silent = true;
 						new CommandClearLog(sender, params, false);
 					} else
@@ -685,7 +679,7 @@ public class CommandsHandler implements CommandExecutor
 						sender.sendMessage(ChatColor.RED + "Redo aborted");
 					return;
 				}
-				if (!params.silent && askRedos && questioner != null && sender instanceof Player && !questioner.ask((Player)sender, "Are you sure you want to continue?", "yes", "no").equals("yes")) {
+				if (!params.silent && askRedos && sender instanceof Player && !logblock.ask((Player)sender, "Are you sure you want to continue?", "yes", "no").equals("yes")) {
 					sender.sendMessage(ChatColor.RED + "Redo aborted");
 					return;
 				}
@@ -727,10 +721,10 @@ public class CommandsHandler implements CommandExecutor
 				rs = state.executeQuery("SELECT count(*) FROM `" + table + "` " + join + params.getWhere());
 				rs.next();
 				if ((deleted = rs.getInt(1)) > 0) {
-					if (!params.silent && askClearLogs && sender instanceof Player && questioner != null) {
+					if (!params.silent && askClearLogs && sender instanceof Player) {
 						sender.sendMessage(ChatColor.DARK_AQUA + "Searching " + params.getTitle() + ":");
 						sender.sendMessage(ChatColor.GREEN.toString() + deleted + " blocks found.");
-						if (!questioner.ask((Player)sender, "Are you sure you want to continue?", "yes", "no").equals("yes")) {
+						if (!logblock.ask((Player)sender, "Are you sure you want to continue?", "yes", "no").equals("yes")) {
 							sender.sendMessage(ChatColor.RED + "ClearLog aborted");
 							return;
 						}

@@ -45,6 +45,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
+import java.util.Vector;
 import java.util.logging.Level;
 
 import static de.diddiz.LogBlock.config.Config.*;
@@ -103,6 +104,9 @@ public class LogBlock extends JavaPlugin
                 consumer = new Consumer(this);
         }
 
+        // Embedded Questioner
+    	private final Vector<Question> questions = new Vector<Question>();
+        
         @Override
         public void onEnable() {
                 final PluginManager pm = getPluginManager();
@@ -112,6 +116,12 @@ public class LogBlock extends JavaPlugin
                 }
                 if (noDb)
                         return;
+               
+                // Embedded Questioner
+        		getServer().getScheduler().scheduleSyncRepeatingTask(this, new QuestionsReaper(questions), 15000, 15000);
+        		getServer().getLogger().info("LogBlockQuestioner enabled");
+
+                
                 if (pm.getPlugin("WorldEdit") != null) {
                         LogBlockEditSessionFactory.initialize(this);
                 }
@@ -135,17 +145,11 @@ public class LogBlock extends JavaPlugin
                         getLogger().info("Scheduled consumer with timer.");
                 }
                 getServer().getScheduler().runTaskAsynchronously(this, new Updater.PlayerCountChecker(this));
-                /*for (final Tool tool : toolsByType.values())
+                for (final Tool tool : toolsByType.values())
                         if (pm.getPermission("logblock.tools." + tool.name) == null) {
                                 final Permission perm = new Permission("logblock.tools." + tool.name, tool.permissionDefault);
                                 pm.addPermission(perm);
                         }
-                try {
-                        Metrics metrics = new Metrics(this);
-                        metrics.start();
-                } catch (IOException ex) {
-                        getLogger().info("Could not start metrics: " + ex.getMessage());
-                }*/
         }
 
         private void registerEvents() {
@@ -198,9 +202,16 @@ public class LogBlock extends JavaPlugin
                 if (logPlayerInfo)
                         pm.registerEvents(new PlayerInfoLogging(this), this);
         }
+        
+    	public String ask(Player respondent, String questionMessage, String... answers) {
+    		final Question question = new Question(respondent, questionMessage, answers);
+    		questions.add(question);
+    		return question.ask();
+    	}
 
         @Override
         public void onDisable() {
+    		getServer().getLogger().info("LogBlockQuestioner disabled");
                 if (timer != null)
                         timer.cancel();
                 getServer().getScheduler().cancelTasks(this);

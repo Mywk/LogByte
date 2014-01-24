@@ -1,13 +1,16 @@
 package de.diddiz.LogBlock;
 
-import static de.diddiz.util.MaterialName.materialName;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import de.diddiz.util.BukkitUtils;
+
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 import de.diddiz.LogBlock.config.Config;
+
 import org.bukkit.Material;
 
 public class BlockChange implements LookupCacheElement
@@ -41,70 +44,79 @@ public class BlockChange implements LookupCacheElement
 		type = p.needType ? rs.getInt("type") : 0;
 		data = p.needData ? rs.getByte("data") : (byte)0;
 		signtext = p.needSignText ? rs.getString("signtext") : null;
-		ca = p.needChestAccess && rs.getShort("itemtype") != 0 && rs.getShort("itemamount") != 0 ? new ChestAccess(rs.getShort("itemtype"), rs.getShort("itemamount"), rs.getByte("itemdata")) : null;
+		ca = p.needChestAccess && rs.getShort("itemtype") != 0 && rs.getShort("itemamount") != 0 ? new ChestAccess(rs.getShort("itemtype"), rs.getShort("itemamount"), rs.getShort("itemdata")) : null;
 	}
 
 	@Override
 	public String toString() {
 		final StringBuilder msg = new StringBuilder();
 		if (date > 0)
-			msg.append(Config.formatter.format(date)).append(" ");
+			msg.append(ChatColor.GRAY + Config.formatter.format(date)).append(" ");
 		if (playerName != null)
-			msg.append(playerName).append(" ");
+			msg.append(ChatColor.WHITE + playerName).append(" ");
 		if (signtext != null) {
 			final String action = type == 0 ? "destroyed " : "created ";
 			if (!signtext.contains("\0"))
 				msg.append(action).append(signtext);
 			else
-				msg.append(action).append(materialName(type != 0 ? type : replaced)).append(" [").append(signtext.replace("\0", "] [")).append("]");
+				msg.append(action).append(""+(type != 0 ? type : replaced)).append(" [").append(signtext.replace("\0", "] [")).append("]");
 		} else if (type == replaced) {
-			//System.out.println("TEST REPLACED");
 			if (type == 0)
 				msg.append("did an unspecified action");
 			else if (ca != null) {
 				if (ca.itemType == 0 || ca.itemAmount == 0)
-					msg.append("looked inside ").append(this.type + ":" + this.data);
+					msg.append("looked inside ").append(materialId(this.type,this.data));
 				else if (ca.itemAmount < 0)
-				{
-					//System.out.println("TEST TOOK");
-					msg.append("took ").append(-ca.itemAmount).append("x ").append(ca.itemType +":"+ ca.itemData);//materialName(ca.itemType, ca.itemData));
-				}
-					else
-					msg.append("put in ").append(ca.itemAmount).append("x ").append(ca.itemType +":"+ ca.itemData);
+					msg.append(ChatColor.RED+"took "+ChatColor.YELLOW).append(-ca.itemAmount).append(" "+ChatColor.AQUA).append(materialId(ca.itemType, ca.itemData)).append(ChatColor.WHITE+" from "+ChatColor.AQUA).append(materialId(this.type,this.data));
+				else
+					msg.append(ChatColor.GREEN+"put "+ChatColor.YELLOW).append(ca.itemAmount).append(" "+ChatColor.AQUA).append(materialId(ca.itemType, ca.itemData)).append(ChatColor.WHITE+" into "+ChatColor.AQUA).append(materialId(this.type,this.data));
 			} else if (BukkitUtils.getContainerBlocks().contains(Material.getMaterial(type)))
-				msg.append("opened ").append(this.type + ":" + this.data);
+				msg.append(ChatColor.GOLD+"opened "+ChatColor.AQUA).append(materialId(this.type,this.data));
 			else if (type == 64 || type == 71)
-				// This is a problem that will have to be addressed in LB 2,
-				// there is no way to tell from the top half of the block if
-				// the door is opened or closed.
-				msg.append("moved ").append(ca.itemType +":"+ ca.itemData);
+				msg.append(ChatColor.GOLD+"moved "+ChatColor.AQUA).append(materialId(this.type,this.data));
 			// Trapdoor
 			else if (type == 96)
-				msg.append((data < 8 || data > 11) ? "opened" : "closed").append(" ").append(this.type + ":" + this.data);
+				msg.append((data < 8 || data > 11) ? "opened" : "closed").append(" ").append(materialId(this.type,this.data));
 			// Fence gate
 			else if (type == 107)
-				msg.append(data > 3 ? "opened" : "closed").append(" ").append(this.type + ":" + this.data);
+				msg.append(data > 3 ? "opened" : "closed").append(" ").append(materialId(this.type,this.data));
 			else if (type == 69)
-				msg.append("switched ").append(this.type + ":" + this.data);
+				msg.append("switched ").append(materialId(this.type,this.data));
 			else if (type == 77 || type == 143)
-				msg.append("pressed ").append(this.type + ":" + this.data);
+				msg.append("pressed ").append(materialId(this.type,this.data));
 			else if (type == 92)
-				msg.append("ate a piece of ").append(this.type + ":" + this.data);
+				msg.append("ate a piece of ").append(materialId(this.type,this.data));
 			else if (type == 25 || type == 93 || type == 94 || type == 149 || type == 150)
-				msg.append("changed ").append(ca.itemType +":"+ ca.itemData);
+				msg.append("changed ").append(materialId(ca.itemType, ca.itemData));
 			else if (type == 70 || type == 72 || type == 147 || type == 148)
-				msg.append("stepped on ").append(this.type + ":" + this.data);
+				msg.append("stepped on ").append(materialId(this.type,this.data));
 			else if (type == 132)
-				msg.append("ran into ").append(this.type + ":" + this.data);
+				msg.append("ran into ").append(materialId(this.type,this.data));
 		} else if (type == 0)
-			msg.append("destroyed ").append(this.replaced + ":" + this.data);
+			msg.append(ChatColor.RED+"- "+ChatColor.AQUA).append(materialId(this.replaced,this.data));
 		else if (replaced == 0)
-			msg.append("created ").append(this.type +":"+ this.data);
+			msg.append(ChatColor.GREEN+"+ "+ChatColor.AQUA).append(materialId(this.type,this.data));
 		else
-			msg.append("replaced ").append(this.type + ":" + this.data).append(" with ").append(this.type + ":" + this.data);
+			msg.append("replaced ").append(materialId(replaced, (byte)0)).append(" with ").append(materialId(this.type,this.data));
 		if (loc != null)
-			msg.append(" at ").append(loc.getBlockX()).append(":").append(loc.getBlockY()).append(":").append(loc.getBlockZ());
+			msg.append(ChatColor.WHITE+" at "+ChatColor.YELLOW).append(loc.getBlockX()).append(":").append(loc.getBlockY()).append(":").append(loc.getBlockZ());
 		return msg.toString();
+	}
+	
+	/**
+	 * @return Display correct id of material
+	 */
+	private static String materialId(int type, byte data) {
+		String c = type + "";
+		if(data!=0)
+			c += ":"+ data;
+		return c;
+	}
+	private static String materialId(short type, short data) {
+		String c = type + "";
+		if(data!=0)
+			c += ":"+ data;
+		return c;
 	}
 
 	@Override

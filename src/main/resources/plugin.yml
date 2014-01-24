@@ -1,5 +1,5 @@
 name: ${project.name}
-version: '2.64'
+version: '2.7'
 author: DiddiZ, Modified by Mywk
 authors: [md_5, ammar2]
 website: http://dev.bukkit.org/server-mods/logblock/
@@ -8,7 +8,7 @@ description: ${project.description}
 softdepend: [LogBlockQuestioner, WorldEdit]
 commands:
   lb:
-    description: 'LogBlock plugin commands'
+    description: 'LogByte plugin commands'
     usage: 'Usage: /<command> help'
     aliases: [logblock]
 permissions:

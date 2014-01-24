@@ -10,6 +10,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Material;
 import org.bukkit.material.Bed;
 import org.bukkit.material.PistonBaseMaterial;
 import org.bukkit.material.PistonExtensionMaterial;
@@ -26,8 +27,8 @@ import java.util.logging.Level;
 import static de.diddiz.LogBlock.config.Config.dontRollback;
 import static de.diddiz.LogBlock.config.Config.replaceAnyway;
 import static de.diddiz.util.BukkitUtils.equalTypes;
+import static de.diddiz.util.BukkitUtils.getContainerBlocks;
 import static de.diddiz.util.BukkitUtils.modifyContainer;
-import static de.diddiz.util.MaterialName.materialName;
 import static org.bukkit.Bukkit.getLogger;
 
 public class WorldEditor implements Runnable
@@ -71,7 +72,7 @@ public class WorldEditor implements Runnable
         this.sender = sender;
     }
 
-	public void queueEdit(int x, int y, int z, int replaced, int type, byte data, String signtext, short itemType, short itemAmount, byte itemData) {
+	public void queueEdit(int x, int y, int z, int replaced, int type, byte data, String signtext, short itemType, short itemAmount, short itemData) {
 		edits.add(new Edit(0, new Location(world, x, y, z), null, replaced, type, data, signtext, new ChestAccess(itemType, itemAmount, itemData)));
 	}
 
@@ -162,21 +163,24 @@ public class WorldEditor implements Runnable
 				if (type == 0) {
 					if (!block.setTypeId(0))
 						throw new WorldEditorException(block.getTypeId(), 0, block.getLocation());
-				} else if (ca != null && (type == 23 || type == 54 || type == 61 || type == 62)) {
-					int leftover;
-					try {
-						leftover = modifyContainer(state, new ItemStack(ca.itemType, -ca.itemAmount, (short)0, ca.itemData));
-						if (leftover > 0)
-							for (final BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST})
-								if (block.getRelative(face).getTypeId() == 54)
-									leftover = modifyContainer(block.getRelative(face).getState(), new ItemStack(ca.itemType, ca.itemAmount < 0 ? leftover : -leftover, (short)0, ca.itemData));
-					} catch (final Exception ex) {
-						throw new WorldEditorException(ex.getMessage(), block.getLocation());
+				} else if (ca != null) {
+					if (getContainerBlocks().contains(Material.getMaterial(type))) {
+						int leftover;
+						try {
+							leftover = modifyContainer(state, new ItemStack(ca.itemType, -ca.itemAmount, ca.itemData));
+							// Special-case blocks which might be double chests
+							if (leftover > 0 && (type == 54 || type == 146))
+								for (final BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST})
+									if (block.getRelative(face).getTypeId() == type)
+										leftover = modifyContainer(block.getRelative(face).getState(), new ItemStack(ca.itemType, ca.itemAmount < 0 ? leftover : -leftover, ca.itemData));
+						} catch (final Exception ex) {
+							throw new WorldEditorException(ex.getMessage(), block.getLocation());
+						}
+						if (!state.update())
+							throw new WorldEditorException("Failed to update inventory of " + block.getTypeId(), block.getLocation());
+						if (leftover > 0 && ca.itemAmount < 0)
+							throw new WorldEditorException("Not enough space left in " +block.getTypeId(), block.getLocation());
 					}
-					if (!state.update())
-						throw new WorldEditorException("Failed to update inventory of " + materialName(block.getTypeId()), block.getLocation());
-					if (leftover > 0 && ca.itemAmount < 0)
-						throw new WorldEditorException("Not enough space left in " + materialName(block.getTypeId()), block.getLocation());
 				} else
 					return PerformResult.NO_ACTION;
 				return PerformResult.SUCCESS;
@@ -203,7 +207,7 @@ public class WorldEditor implements Runnable
 				for (int i = 0; i < 4; i++)
 					sign.setLine(i, lines[i]);
 				if (!sign.update())
-					throw new WorldEditorException("Failed to update signtext of " + materialName(block.getTypeId()), block.getLocation());
+					throw new WorldEditorException("Failed to update signtext of " + block.getTypeId(), block.getLocation());
 			} else if (curtype == 26) {
 				final Bed bed = (Bed)block.getState().getData();
 				final Block secBlock = bed.isHeadOfBed() ? block.getRelative(bed.getFacing().getOppositeFace()) : block.getRelative(bed.getFacing());
@@ -231,7 +235,7 @@ public class WorldEditor implements Runnable
 		private final Location loc;
 
 		public WorldEditorException(int typeBefore, int typeAfter, Location loc) {
-			this("Failed to replace " + materialName(typeBefore) + " with " + materialName(typeAfter), loc);
+			this("Failed to replace " + typeBefore + " with " + typeAfter, loc);
 		}
 
 		public WorldEditorException(String msg, Location loc) {

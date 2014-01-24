@@ -67,6 +67,7 @@ public class BlockPlaceLogging extends LoggingListener
 			//Sign logging is handled elsewhere
 			if (wcfg.isLogging(Logging.SIGNTEXT) && (type.getId() == 63 || type.getId() == 68)) return;
 
+			//Delay queuing by one tick to allow data to be updated
 			LogBlock.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(LogBlock.getInstance(), new Runnable()
 			{
 				@Override

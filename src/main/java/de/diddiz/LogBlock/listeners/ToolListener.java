@@ -48,7 +48,7 @@ public class ToolListener implements Listener
 			if (tool != null && (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK) && logblock.hasPermission(player, "logblock.tools." + tool.name)) {
 				final ToolBehavior behavior = action == Action.RIGHT_CLICK_BLOCK ? tool.rightClickBehavior : tool.leftClickBehavior;
 				final ToolData toolData = getSession(player).toolData.get(tool);
-				if ((behavior != ToolBehavior.NONE ) && toolData.enabled) {
+				if (behavior != ToolBehavior.NONE && toolData.enabled) {
 					if (!isLogged(player.getWorld())) {
 						player.sendMessage(ChatColor.RED + "This world is not currently logged.");
 						event.setCancelled(true);
@@ -60,19 +60,19 @@ public class ToolListener implements Listener
 					params.sel = null;
 					if (behavior == ToolBehavior.BLOCK)
 						params.setLocation(block.getRelative(event.getBlockFace()).getLocation());
-					else if (block.getTypeId() != 54 || tool.params.radius != 0)
+					else if ((block.getTypeId() != 54 && block.getTypeId() != 146) || tool.params.radius != 0)
 						params.setLocation(block.getLocation());
 					else {
 						if (logblock.getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
 							for (final BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST}) {
-								if (block.getRelative(face).getTypeId() == 54) {
+								if (block.getRelative(face).getTypeId() == block.getTypeId()) {
 									params.setSelection(RegionContainer.fromCorners(event.getPlayer().getWorld(),
 											block.getLocation(), block.getRelative(face).getLocation()));
 								}
 							}
-							if (params.sel == null) {
-								params.setLocation(block.getLocation());
-							}
+						}
+						if (params.sel == null) {
+							params.setLocation(block.getLocation());
 						}
 					}
 					try {
