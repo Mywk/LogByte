@@ -154,6 +154,7 @@ public class LogBlock extends JavaPlugin
 
         private void registerEvents() {
                 final PluginManager pm = getPluginManager();
+                pm.registerEvents(new LogBlockQuestionerPlayerListener(questions), this);
                 pm.registerEvents(new ToolListener(this), this);
                 // Possible future use
                 //pm.registerEvents(new ProjectileHitLogging(this), this);
